@@ -1,3 +1,5 @@
+package org.example.Laboratorio1;
+
 // ============================================================================
 class CuentaIncrementos {
 // ============================================================================
@@ -16,20 +18,30 @@ class CuentaIncrementos {
 
 
 // ============================================================================
-class MiHebra extends Thread {
+class MiHebra4 extends Thread {
 // ============================================================================
   // Declaracion de variables
-  // ... 
+  // ...
+  int miId;
+  CuentaIncrementos c;
 
   // --------------------------------------------------------------------------
   // Definicion del constructor, si es necesario
-  // ... 
+  // ...
+    public MiHebra4(int miId, CuentaIncrementos c){
+      this.miId = miId;
+      this.c = c;
+    }
 
   // --------------------------------------------------------------------------
   public void run() {
     System.out.println( "Hebra: " + miId + " Comenzando incrementos" );
     // Bucle de 1000000 incrementos del objeto compartido
-    // ... 
+    // ...
+
+    for(int i = 0; i < 1000000; i++){
+      c.incrementaContador();
+    }
     System.out.println( "Hebra: " + miId + " Terminando incrementos" );
   }
 }
