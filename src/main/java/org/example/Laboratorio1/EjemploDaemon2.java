@@ -37,6 +37,7 @@ class EjemploDaemon2 {
     // Espera la finalizacion de las hebras t0 y t1
     // ... (E)
 
+
     System.out.println( "Hebra Principal finaliza" );
   }
 }
