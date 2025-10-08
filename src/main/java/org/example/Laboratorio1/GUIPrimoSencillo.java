@@ -73,14 +73,11 @@ public class GUIPrimoSencillo {
             try {
               // Validacion del numero
               long numero = Long.parseLong( txfNumero.getText().trim() );
-              // Calculo e impresion en el terminal
-              System.out.println( "Examinando numero: " + numero );
-              boolean primo = esPrimo( numero );
-              if( primo ) {
-                System.out.println( "El numero " + numero + " SI es primo." );
-              } else {
-                System.out.println( "El numero " + numero + " NO es primo." );
-              }
+
+              HebraPrima hP0 = new HebraPrima(numero);
+              //hP0.setDaemon(true);
+              hP0.start();
+
             } catch( NumberFormatException ex ) {
               txfMensajes.setText( "No es un numero correcto." );
             }
@@ -134,5 +131,24 @@ public class GUIPrimoSencillo {
       }
     }
     return( primo );
+  }
+
+  class HebraPrima extends Thread {
+    long numero;
+    public HebraPrima( long numero ) {
+      this.numero = numero;
+    }
+    public void run() {
+      // Calculo e impresion en el terminal
+      System.out.println( "Examinando numero: " + numero );
+
+      boolean primo = esPrimo( numero );
+
+      if( primo ) {
+        System.out.println( "El numero " + numero + " SI es primo." );
+      } else {
+        System.out.println( "El numero " + numero + " NO es primo." );
+      }
+    }
   }
 }

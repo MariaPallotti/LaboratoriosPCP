@@ -99,7 +99,7 @@ class EjemploIncrementos {
     }
 
     //(4.6)
-    System.out.println("Valor final del contador c" + contador.dameContador());
+    System.out.println("Valor final del contador z" + contador.dameContador());
   }
 }
 

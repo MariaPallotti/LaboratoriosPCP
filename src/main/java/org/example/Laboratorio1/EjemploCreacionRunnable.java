@@ -15,6 +15,8 @@ class EjemploCreacionRunnable {
   public static void main( String args[] ) {
     Thread h1 = new Thread(new MiRun(0));
     Thread h2 = new Thread(new MiRun(1));
+    //h1.start();
+    //h2.start();
 
     h1.run();
     h2.run();
