@@ -1,5 +1,6 @@
 package org.example.Laboratorio2;
 
+import static java.lang.Math.min;
 import static org.example.Laboratorio2.EjemploFuncionSencilla.evaluaFuncion;
 
 // ============================================================================
@@ -228,7 +229,7 @@ class miHebraBloques2 extends Thread{
   public void run(){
     int tam = (numero + numHebras -1)/ numHebras ;
     int inicio = tam*miId;
-    int fin = inicio + tam;
+    int fin = min(inicio + tam, numero);
 
     for(int i = inicio; i < fin; i++) {
       vectorY[i] = evaluaFuncion(vectorX[i]);
