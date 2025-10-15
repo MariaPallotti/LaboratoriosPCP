@@ -36,7 +36,12 @@ class EjemploDaemon2 {
 
     // Espera la finalizacion de las hebras t0 y t1
     // ... (E)
-
+    /*try{
+      t0.join();
+      t1.join();
+    }catch (InterruptedException ex){
+      ex.printStackTrace();
+    }*/
 
     System.out.println( "Hebra Principal finaliza" );
   }
