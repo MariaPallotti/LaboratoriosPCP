@@ -220,7 +220,7 @@ class MiHebraPrimoDistDinamica extends Thread{
   }
   public void run(){
     while(num.get() < vectorTrabajo.length ){
-      post = num.getAndAdd(1);
+      post = num.getAndIncrement();
       if( EjemploMuestraPrimosEnVector.esPrimo( vectorTrabajo[ post ] ) ) {
         System.out.println( "  Encontrado primo: " + vectorTrabajo[ post ] );
       }
