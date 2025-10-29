@@ -1,42 +1,47 @@
 package org.example.Laboratorio4;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicLong;
 
-/*
+
 // ===========================================================================
 class ZonaIntercambio {
 // ===========================================================================
   // ...
+  volatile long tiempo;
 
-	public ZonaIntercambio ( ... ) {
-    // ...
+  public ZonaIntercambio ( ) {
+    tiempo = 500;
   }
 
   // -------------------------------------------------------------------------
-  void setTiempo( ... ) {
+  void setTiempo(long t) {
     // ...
+    tiempo = t;
   }
 
   // -------------------------------------------------------------------------
-  long getTiempo( ... ) {
-    // ...
+  long getTiempo( ) {
+    return tiempo;
   }
 }
-*/
+
 
 // ===========================================================================
-public class GUISecuenciaPrimos {
+public class GUISecuenciaPrimosSlider {
 // ===========================================================================
   JFrame      container;
   JPanel      jpanel;
   JTextField  txfMensajes;
   JButton     btnIniciaSecuencia, btnCancelaSecuencia;
   JSlider     sldEspera;
-  HebraTrabajadora  t; // Ejercicio 2.2
-  //ZonaIntercambio   z; // Ejercicio 2.3
+  HebraTrabajadoraSlider  t; // Ejercicio 2.2
+  ZonaIntercambio   z; // Ejercicio 2.3
   
   // -------------------------------------------------------------------------
   public static void main( String args[] ) {
@@ -101,7 +106,7 @@ public class GUISecuenciaPrimos {
           btnIniciaSecuencia.setEnabled( false );
           btnCancelaSecuencia.setEnabled( true );
 
-          t = new HebraTrabajadora(txfMensajes);
+          t = new HebraTrabajadoraSlider(txfMensajes, z);
           t.start();
         }
     } );
@@ -124,7 +129,9 @@ public class GUISecuenciaPrimos {
         if ( ! sl.getValueIsAdjusting() ) {
           long tiempoEnMilisegundos = ( long ) sl.getValue();
           System.out.println( "JSlider value = " + tiempoEnMilisegundos );
-          // ...
+          // ...TODO
+          z.setTiempo(tiempoEnMilisegundos);
+
         }
       }
     } );
@@ -155,12 +162,14 @@ public class GUISecuenciaPrimos {
   }
 }
 
-class HebraTrabajadora extends Thread{
+class HebraTrabajadoraSlider extends Thread{
   JTextField txfmesg;
   volatile boolean fin;
+  ZonaIntercambio z;
 
-  public  HebraTrabajadora( JTextField txf){
+  public  HebraTrabajadoraSlider( JTextField txf, ZonaIntercambio z){
     this.txfmesg = txf;
+    this.z = z;
   }
 
   public void cancela(){ fin = true; }
@@ -169,8 +178,14 @@ class HebraTrabajadora extends Thread{
     fin = false;
     while(! fin) {
       if(GUISecuenciaPrimos.esPrimo(i)){
-        final long prim = i;
-        SwingUtilities.invokeLater( () -> txfmesg.setText(String.valueOf(prim)));
+        try{
+          sleep(z.getTiempo());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+          final long prim = i;
+          SwingUtilities.invokeLater( () -> txfmesg.setText(String.valueOf(prim)));
       }
       i++;
     }
