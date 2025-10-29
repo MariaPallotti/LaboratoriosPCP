@@ -45,7 +45,7 @@ public class GUISecuenciaPrimosSlider {
   
   // -------------------------------------------------------------------------
   public static void main( String args[] ) {
-    GUISecuenciaPrimos gui = new GUISecuenciaPrimos();
+    GUISecuenciaPrimosSlider gui = new GUISecuenciaPrimosSlider();
     SwingUtilities.invokeLater(new Runnable(){
       public void run(){
         gui.go();
@@ -58,6 +58,7 @@ public class GUISecuenciaPrimosSlider {
     // Constantes.
     final int valorMaximo = 1000;
     final int valorMedio  = 500;
+    z = new ZonaIntercambio();
 
     // Variables.
     JPanel  tempPanel;
@@ -177,7 +178,7 @@ class HebraTrabajadoraSlider extends Thread{
     long i = 1L;
     fin = false;
     while(! fin) {
-      if(GUISecuenciaPrimos.esPrimo(i)){
+      if(GUISecuenciaPrimosSlider.esPrimo(i)){
         try{
           sleep(z.getTiempo());
         } catch (InterruptedException e) {
