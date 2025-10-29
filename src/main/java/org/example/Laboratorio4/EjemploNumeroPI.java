@@ -10,7 +10,7 @@ class Acumula {
 
   // -------------------------------------------------------------------------
   Acumula() {
-    suma = 0;
+    this.suma = 0.0;
   }
 
   // -------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class MiHebraMultAcumulaciones extends Thread {
       double baseRectangulo = 1.0 / ((double) numRectangulos);
       for(long i = miId; i < numRectangulos; i += numHebras) {
           double x = baseRectangulo * ( ( ( double ) i ) + 0.5 );
-          a.acumulaDato(EjemploNumeroPI.f( x ) * baseRectangulo);
+          a.acumulaDato(EjemploNumeroPI.f( x ));
       }
   }
 }
@@ -74,7 +74,7 @@ class MiHebraUnaAcumulacion extends Thread {
 
     for(long i = miId; i < numRectangulos; i += numHebras) {
       double x = baseRectangulo * ( ( ( double ) i ) + 0.5 );
-      sumaL += EjemploNumeroPI.f( x ) * baseRectangulo;
+      sumaL += EjemploNumeroPI.f( x );
     }
 
     a.acumulaDato(sumaL);
@@ -103,7 +103,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
 
     for (long i = miId; i < numRectangulos; i += numHebras) {
       double x = baseRectangulo * (((double) i) + 0.5);
-      a.add(EjemploNumeroPI.f(x) * baseRectangulo);
+      a.add(EjemploNumeroPI.f(x));
     }
   }
 }
@@ -131,7 +131,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
 
       for (long i = miId; i < numRectangulos; i += numHebras) {
         double x = baseRectangulo * (((double) i) + 0.5);
-        sumaL += EjemploNumeroPI.f(x) * baseRectangulo;
+        sumaL += EjemploNumeroPI.f(x);
       }
       a.add(sumaL);
     }
@@ -151,6 +151,10 @@ class MiHebraMultAcumulacionAtomica extends Thread {
       double tSec, tPar;
       Acumula a;
       MiHebraMultAcumulaciones vt[];
+      MiHebraUnaAcumulacion [] vm;
+      MiHebraMultAcumulacionAtomica[] vma;
+      MiHebraUnaAcumulacionAtomica [] vua;
+      DoubleAdder b;
 
       // Comprobacion de los argumentos de entrada.
       if (args.length != 2) {
@@ -219,7 +223,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
         }
       }
 
-      pi = a.dameDato();
+      pi = a.dameDato() * baseRectangulo;
 
       t2 = System.nanoTime();
       tPar = ((double) (t2 - t1)) / 1.0e9;
@@ -234,12 +238,10 @@ class MiHebraMultAcumulacionAtomica extends Thread {
       System.out.println();
       System.out.print("Inicio del calculo paralelo: ");
       System.out.println("Una acumulacion por hebra.");
+      vm = new MiHebraUnaAcumulacion[numHebras];
+      a = new Acumula();
       t1 = System.nanoTime();
       // ...
-
-      MiHebraUnaAcumulacion [] vm = new MiHebraUnaAcumulacion[numHebras];
-      a = new Acumula();
-
       for (int i = 0; i < numHebras; i++) {
         vm[i] = new MiHebraUnaAcumulacion(i, numHebras, numRectangulos, a);
         vm[i].start();
@@ -253,7 +255,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
         }
       }
 
-      pi = a.dameDato();
+      pi = a.dameDato() * baseRectangulo;
 
       t2 = System.nanoTime();
       tPar = ((double) (t2 - t1)) / 1.0e9;
@@ -271,8 +273,8 @@ class MiHebraMultAcumulacionAtomica extends Thread {
       t1 = System.nanoTime();
       // ...
 
-      MiHebraMultAcumulacionAtomica []vma = new MiHebraMultAcumulacionAtomica[numHebras];
-      DoubleAdder b = new DoubleAdder();
+      vma = new MiHebraMultAcumulacionAtomica[numHebras];
+      b = new DoubleAdder();
 
       for (int i = 0; i < numHebras; i++) {
         vma[i] = new MiHebraMultAcumulacionAtomica(i, numHebras, numRectangulos, b);
@@ -287,7 +289,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
         }
       }
 
-      pi = b.doubleValue();
+      pi = b.doubleValue() * baseRectangulo;
 
       t2 = System.nanoTime();
       tPar = ((double) (t2 - t1)) / 1.0e9;
@@ -305,7 +307,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
       t1 = System.nanoTime();
       // ...
 
-      MiHebraUnaAcumulacionAtomica []vua = new MiHebraUnaAcumulacionAtomica[numHebras];
+      vua = new MiHebraUnaAcumulacionAtomica[numHebras];
       b = new DoubleAdder();
 
       for (int i = 0; i < numHebras; i++) {
@@ -321,7 +323,7 @@ class MiHebraMultAcumulacionAtomica extends Thread {
         }
       }
 
-      pi = b.doubleValue();
+      pi = b.doubleValue() * baseRectangulo;
 
       t2 = System.nanoTime();
       tPar = ((double) (t2 - t1)) / 1.0e9;

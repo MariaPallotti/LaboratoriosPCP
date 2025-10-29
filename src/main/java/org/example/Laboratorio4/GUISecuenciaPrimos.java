@@ -164,13 +164,14 @@ class HebraTrabajadora extends Thread{
   }
 
   public void cancela(){ fin = true; }
+
   public void run(){
     long i = 1L;
     fin = false;
     while(! fin) {
       if(GUISecuenciaPrimos.esPrimo(i)){
         final long prim = i;
-        SwingUtilities.invokeLater( () -> txfmesg.setText(String.valueOf(prim)));
+        SwingUtilities.invokeLater( () -> txfmesg.setText(Long.valueOf(prim).toString()));
       }
       i++;
     }

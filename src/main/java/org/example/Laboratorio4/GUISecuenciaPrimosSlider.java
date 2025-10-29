@@ -186,7 +186,7 @@ class HebraTrabajadoraSlider extends Thread{
         }
 
           final long prim = i;
-          SwingUtilities.invokeLater( () -> txfmesg.setText(String.valueOf(prim)));
+          SwingUtilities.invokeLater( () -> txfmesg.setText(Long.valueOf(prim).toString()));
       }
       i++;
     }
