@@ -543,7 +543,7 @@ class MiHebra_4 extends Thread {
     }
   }
 
-  public synchronized static void contabilizaPalabra(
+  public static void contabilizaPalabra(
           Map<String,Integer> cuentaPalabras,
           String palabra ) {
     cuentaPalabras.merge(palabra, 1, (oldV, newV) -> newV + oldV);
@@ -616,13 +616,21 @@ class MiHebra_6 extends Thread {
         // Procesa cada palabra de la linea "i", si es distinta de blanco.
         palabraActual = palabras[ j ].trim();
         if( palabraActual.length() > 0 ) {
-          AtomicInteger a = hmCuentaPalabras.putIfAbsent(palabraActual, new AtomicInteger(1));
-          if (a != null) {
-            a.getAndIncrement();
-          }        }
+          contabilizaPalabra(hmCuentaPalabras, palabraActual);
+        }
       }
     }
   }
 
+  public static void contabilizaPalabra(
+          ConcurrentHashMap<String,AtomicInteger> cuentaPalabras,
+          String palabra ) {
+    AtomicInteger a = cuentaPalabras.putIfAbsent(palabra, new AtomicInteger(1));
+    if (a != null) {
+      a.getAndIncrement();
+    }
+  }
 }
+
+
 
