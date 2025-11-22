@@ -57,6 +57,14 @@ int main( int argc, char * argv[] ) {
 
   // Difusion del vector vecArgs con operaciones punto a punto.
   // ... (A)
+
+  if ( miId == 0) {
+    for ( i = 0; i < numProcs ; i++){
+      MPI_Send( vecArgs, 5, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD);
+    }
+  } else {
+    MPI_Recv( vecArgs, 5, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD, &s);
+  }
   
   // El resto de procesos inicializan las cinco variables con la 
   // informacion del vector. El proceso 0 no tiene que hacerlo porque
@@ -122,6 +130,17 @@ int main( int argc, char * argv[] ) {
     // Bucle de envio/recepcion de "numMensajes" de tamanyo "tam" y toma de tiempos.
     // ... (B)
 
+    if ( miId == 0 ) {
+    for ( i = 0; i < numProcs ; i++){
+      MPI_Ssend( numMensajes, 1, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD);
+      }
+    } if ( miId == 1 ) {
+      MPI_Recv( numMensajes, 1, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD, &s);
+    }
+
+    // Sincronizacion de todos los procesos
+    MPI_Barrier( MPI_COMM_WORLD );
+    
     // Calculo de prestaciones: tiempoTotal, tiempoPorMensajeEnMicroseg,
     // anchoDeBandaEnMbs.
     // ... (C)
