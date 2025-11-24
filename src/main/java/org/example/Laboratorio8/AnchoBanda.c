@@ -8,10 +8,10 @@ int main( int argc, char * argv[] ) {
   MPI_Status  s;
   int         numProcs, miId, numArgs, vecArgs[ 5 ] = { 0, 0, 0, 0, 0 };
   int         numMensajes, minTam, maxTam, incTam, tam, i, j;
-  char        * ptrWorkspace;
+  char        *ptrWorkspace;
   double      t1, t2, tiempoTotal, tiempoPorMensajeEnMicroseg,
               anchoDeBandaEnMbs;
-  char        miNombreProc[ MPI_MAX_PROCESSOR_NAME ];
+  char        miNombreProc[ MPI_MAX_PROCESSOR_NAME ], mensjB;
   int         longNombreProc;
 
   // Inicializacion de MPI.
@@ -59,12 +59,14 @@ int main( int argc, char * argv[] ) {
   // ... (A)
 
   if ( miId == 0) {
-    for ( i = 0; i < numProcs ; i++){
-      MPI_Send( vecArgs, 5, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD);
+    for ( i = 1; i < numProcs ; i++){
+      MPI_Send( vecArgs, 5, MPI_INT, i, 88, MPI_COMM_WORLD);
     }
   } else {
-    MPI_Recv( vecArgs, 5, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD, &s);
+    MPI_Recv( vecArgs, 5, MPI_INT, 0, 88, MPI_COMM_WORLD, &s);
   }
+  
+   MPI_Barrier( MPI_COMM_WORLD );
   
   // El resto de procesos inicializan las cinco variables con la 
   // informacion del vector. El proceso 0 no tiene que hacerlo porque
@@ -129,21 +131,42 @@ int main( int argc, char * argv[] ) {
 
     // Bucle de envio/recepcion de "numMensajes" de tamanyo "tam" y toma de tiempos.
     // ... (B)
+	
+	if ( miId == 0) {
+		
+	  t1 = MPI_Wtime();
+	  
+	  for( i = 0; i < numMensajes; i++) {  
+        MPI_Send( ptrWorkspace, tam, MPI_CHAR, 1, 88, MPI_COMM_WORLD);
+	  }
+	  MPI_Recv( &mensjB, 0, MPI_CHAR, 1, 88, MPI_COMM_WORLD, &s);
 
-    if ( miId == 0 ) {
-    for ( i = 0; i < numProcs ; i++){
-      MPI_Ssend( numMensajes, 1, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD);
-      }
-    } if ( miId == 1 ) {
-      MPI_Recv( numMensajes, 1, MPI_INT, MPI_ANY_TAG, 88, MPI_COMM_WORLD, &s);
+   
+    } else if ( miId == 1 ){
+	  for( i = 0; i < numMensajes; i++) { 
+        MPI_Recv( ptrWorkspace, tam, MPI_CHAR, 0, 88, MPI_COMM_WORLD, &s);
+	  }
+	  MPI_Send( &mensjB, 0, MPI_CHAR, 0, 88, MPI_COMM_WORLD);
     }
+
 
     // Sincronizacion de todos los procesos
     MPI_Barrier( MPI_COMM_WORLD );
+	
+	if( miId == 0 ) {
+	  t2 = MPI_Wtime();
+	}
     
     // Calculo de prestaciones: tiempoTotal, tiempoPorMensajeEnMicroseg,
     // anchoDeBandaEnMbs.
     // ... (C)
+	
+	if( miId == 0 ) {
+
+	  tiempoTotal = t2-t1;
+      tiempoPorMensajeEnMicroseg = (tiempoTotal / numMensajes) * 1000000;
+      anchoDeBandaEnMbs = (tam * numMensajes) / (tiempoTotal * 1000000);
+	}
 
     // Escritura de resultados.
     if ( miId == 0 ) {
