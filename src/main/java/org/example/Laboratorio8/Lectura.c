@@ -18,12 +18,12 @@ int main(int argc, char *argv[])
   // ------ PARTE CENTRAL DEL CODIGO (INICIO) ---------------------------------
   // Definicion e inicializacion de la variable n
   int n = ( miId + 1 ) * numProcs, i;
-  MPI_Status = s;
+  MPI_Status s;
   
   // El proceso 0 lee un numero desde teclado sobre la variable n
   if ( miId == 0) {
     printf ("Dame un numero --> \n"); scanf ("%d", &n);
-    for( i = 0; i < numProcs; i++ ){
+    for( i = 1; i < numProcs; i++ ){
       MPI_Send( &n, 1, MPI_INT, i, 88, MPI_COMM_WORLD);
     }
   }else{

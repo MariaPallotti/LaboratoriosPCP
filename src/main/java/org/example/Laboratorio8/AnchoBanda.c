@@ -11,7 +11,7 @@ int main( int argc, char * argv[] ) {
   char        *ptrWorkspace;
   double      t1, t2, tiempoTotal, tiempoPorMensajeEnMicroseg,
               anchoDeBandaEnMbs;
-  char        miNombreProc[ MPI_MAX_PROCESSOR_NAME ], mensjB;
+  char        miNombreProc[ MPI_MAX_PROCESSOR_NAME ];
   int         longNombreProc;
 
   // Inicializacion de MPI.
@@ -133,29 +133,23 @@ int main( int argc, char * argv[] ) {
     // ... (B)
 	
 	if ( miId == 0) {
-		
+      
+      printf("Empieza la medicion:\n");
 	  t1 = MPI_Wtime();
 	  
 	  for( i = 0; i < numMensajes; i++) {  
         MPI_Send( ptrWorkspace, tam, MPI_CHAR, 1, 88, MPI_COMM_WORLD);
 	  }
-	  MPI_Recv( &mensjB, 0, MPI_CHAR, 1, 88, MPI_COMM_WORLD, &s);
+	  MPI_Recv( ptrWorkspace, 0, MPI_CHAR, 1, 88, MPI_COMM_WORLD, &s);
+      t2 = MPI_Wtime();
 
    
     } else if ( miId == 1 ){
 	  for( i = 0; i < numMensajes; i++) { 
         MPI_Recv( ptrWorkspace, tam, MPI_CHAR, 0, 88, MPI_COMM_WORLD, &s);
 	  }
-	  MPI_Send( &mensjB, 0, MPI_CHAR, 0, 88, MPI_COMM_WORLD);
+	  MPI_Send( ptrWorkspace, 0, MPI_CHAR, 0, 88, MPI_COMM_WORLD);
     }
-
-
-    // Sincronizacion de todos los procesos
-    MPI_Barrier( MPI_COMM_WORLD );
-	
-	if( miId == 0 ) {
-	  t2 = MPI_Wtime();
-	}
     
     // Calculo de prestaciones: tiempoTotal, tiempoPorMensajeEnMicroseg,
     // anchoDeBandaEnMbs.
