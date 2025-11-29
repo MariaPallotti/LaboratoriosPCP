@@ -54,7 +54,7 @@ int main( int argc, char *argv[] ) {
     printf( "\n" );
   }
   fflush( stdout );
-/*
+
   // Comprueba que hay al menos 2 procesos para la version paralela.
   // La version paralela necesita al menos 2 procesos: 
   // 1 coordinador y al menos 1 trabajador.
@@ -81,15 +81,34 @@ int main( int argc, char *argv[] ) {
   // Codigo del Ejercicio 1 o del Ejercicio 2
   // ...
 
+  if ( miId == 0) {
+    for(i = 0; i < dimVectorNumeros; i++) {
+      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, 1, 22, MPI_COMM_WORLD);  
+    }
+    MPI_Send( &vectorNumeros[0], 1, MPI_LONG_LONG_INT, 1, 33, MPI_COMM_WORLD);  
+    MPI_Recv( &numPrimosPar, 1, MPI_INT, 1, 22, MPI_COMM_WORLD, &s); 
+  }
+  if ( miId == 1 ) {
+    i = 0;
+    while( true ) {
+      MPI_Recv( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &s);  
+      if( s.MPI_TAG == 33 ) { break; }
+      if( esPrimo( vectorNumeros[ i ] ) ) {
+        numPrimosPar++;
+      }
+      i++;
+    }
+    MPI_Send( &numPrimosPar, 1, MPI_INT, 0, 22, MPI_COMM_WORLD); 
+  }
   MPI_Barrier( MPI_COMM_WORLD );
   t2 = MPI_Wtime(); ttPar = t2 - t1;
   if( miId == 0 ) {
     printf( "Implementacion paralela.    Tiempo (s): %lf\n", ttPar );
     if (argc == 1)
-      printf( "Implementacion paralela.    Incremento: %lf\n", ... );
+      printf( "Implementacion paralela.    Incremento: %lf\n", ttSec/ttPar );
     printf( "Numero de primos en el vector: %d\n", numPrimosPar );
   }
-*/
+
   // El proceso 0 destruye el vector de primos.
   if( miId == 0 ) {
     free( vectorNumeros );
