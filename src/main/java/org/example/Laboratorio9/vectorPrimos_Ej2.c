@@ -83,22 +83,33 @@ int main( int argc, char *argv[] ) {
 
   if ( miId == 0) {
     for(i = 0; i < dimVectorNumeros; i++) {
-      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, 1, 22, MPI_COMM_WORLD);  
+      MPI_Recv( &peticion, 1, MPI_CHAR, MPI_ANY_SOURCE, 55, MPI_COMM_WORLD, &s);  
+      num = s.MPI_SOURCE;
+      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, &num, 55, MPI_COMM_WORLD);  
     }
-    MPI_Send( &vectorNumeros[0], 1, MPI_LONG_LONG_INT, 1, 33, MPI_COMM_WORLD);  
-    MPI_Recv( &numPrimosPar, 1, MPI_INT, 1, 22, MPI_COMM_WORLD, &s); 
-  }
-  if ( miId == 1 ) {
+    for(i = 0; i < numProcs; i++) {
+      MPI_Recv( &peticion, 1, MPI_CHAR, MPI_ANY_SOURCE, 55, MPI_COMM_WORLD, &s);  
+      num = s.MPI_SOURCE;
+      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, &num, 44, MPI_COMM_WORLD);  
+    }
+    for(i = 0; i < numProcs; i++) {
+        MPI_Recv( &numPrimosParLocal, 1, MPI_CHAR, MPI_ANY_SOURCE, 55, MPI_COMM_WORLD, &s); 
+        numPrimosPar += numPrimosParLocal
+    }
+    
+    
+  } else {
     i = 0;
     while( true ) {
+      MPI_Send( &peticion, 1, MPI_CHAR, 0, 55, MPI_COMM_WORLD); 
       MPI_Recv( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &s);  
-      if( s.MPI_TAG == 33 ) { break; }
+      if( s.MPI_TAG == 44 ) { break; }
       if( esPrimo( vectorNumeros[ i ] ) ) {
-        numPrimosPar++;
+        numPrimosParLocal++;
       }
       i++;
     }
-    MPI_Send( &numPrimosPar, 1, MPI_INT, 0, 22, MPI_COMM_WORLD); 
+    MPI_Send( &numPrimosParLocal, 1, MPI_INT, 0, 55, MPI_COMM_WORLD); 
   }
   MPI_Barrier( MPI_COMM_WORLD );
   t2 = MPI_Wtime(); ttPar = t2 - t1;
