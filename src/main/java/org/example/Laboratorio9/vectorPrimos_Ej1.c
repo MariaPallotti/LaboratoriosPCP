@@ -90,7 +90,7 @@ int main( int argc, char *argv[] ) {
   }
   if ( miId == 1 ) {
     i = 0;
-    while( true ) {
+    while( 1 ) {
       MPI_Recv( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &s);  
       if( s.MPI_TAG == 33 ) { break; }
       if( esPrimo( vectorNumeros[ i ] ) ) {
@@ -100,6 +100,7 @@ int main( int argc, char *argv[] ) {
     }
     MPI_Send( &numPrimosPar, 1, MPI_INT, 0, 22, MPI_COMM_WORLD); 
   }
+  
   MPI_Barrier( MPI_COMM_WORLD );
   t2 = MPI_Wtime(); ttPar = t2 - t1;
   if( miId == 0 ) {

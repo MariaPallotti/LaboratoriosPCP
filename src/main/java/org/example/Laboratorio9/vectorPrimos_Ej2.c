@@ -4,7 +4,7 @@
 
 #define VECTOR_CORTO
 
-// ============================================================================
+// // ============================================================================
 // Declaracion de prototipos locales.
 
 int esPrimo( long long num );
@@ -68,7 +68,7 @@ int main( int argc, char *argv[] ) {
   // Implementacion Paralela.
   // ========================
   // 
-  int        numPrimosParLocal, numPrimosPar;
+  int        numPrimosParLocal, numPrimosPar, aux;
   long long  num;
   char       peticion;
   double     ttPar;
@@ -84,33 +84,27 @@ int main( int argc, char *argv[] ) {
   if ( miId == 0) {
     for(i = 0; i < dimVectorNumeros; i++) {
       MPI_Recv( &peticion, 1, MPI_CHAR, MPI_ANY_SOURCE, 55, MPI_COMM_WORLD, &s);  
-      num = s.MPI_SOURCE;
-      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, &num, 55, MPI_COMM_WORLD);  
+      aux = s.MPI_SOURCE;
+      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, aux, 55, MPI_COMM_WORLD);  
     }
-    for(i = 0; i < numProcs; i++) {
+    for(i = 0; i < numProcs-1; i++) {
       MPI_Recv( &peticion, 1, MPI_CHAR, MPI_ANY_SOURCE, 55, MPI_COMM_WORLD, &s);  
-      num = s.MPI_SOURCE;
-      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, &num, 44, MPI_COMM_WORLD);  
+      aux = s.MPI_SOURCE;
+      MPI_Send( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, aux, 44, MPI_COMM_WORLD);  
     }
-    for(i = 0; i < numProcs; i++) {
-        MPI_Recv( &numPrimosParLocal, 1, MPI_CHAR, MPI_ANY_SOURCE, 55, MPI_COMM_WORLD, &s); 
-        numPrimosPar += numPrimosParLocal
-    }
-    
-    
   } else {
-    i = 0;
-    while( true ) {
+    while( 1 ) {
       MPI_Send( &peticion, 1, MPI_CHAR, 0, 55, MPI_COMM_WORLD); 
-      MPI_Recv( &vectorNumeros[i], 1, MPI_LONG_LONG_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &s);  
+      MPI_Recv( &num, 1, MPI_LONG_LONG_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &s);  
       if( s.MPI_TAG == 44 ) { break; }
-      if( esPrimo( vectorNumeros[ i ] ) ) {
+      if( esPrimo( num ) ) {
         numPrimosParLocal++;
       }
-      i++;
-    }
-    MPI_Send( &numPrimosParLocal, 1, MPI_INT, 0, 55, MPI_COMM_WORLD); 
+    } 
   }
+  
+  MPI_Reduce(&numPrimosParLocal, &numPrimosPar, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+  
   MPI_Barrier( MPI_COMM_WORLD );
   t2 = MPI_Wtime(); ttPar = t2 - t1;
   if( miId == 0 ) {
