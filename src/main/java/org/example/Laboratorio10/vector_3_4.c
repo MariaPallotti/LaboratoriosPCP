@@ -4,7 +4,7 @@
 #include "math.h"
 
 //#define IMPRIME 1
-#define COSTOSA 1
+//#define COSTOSA 1
 
 // ============================================================================
 
@@ -146,15 +146,11 @@ int main( int argc, char *argv[] ) {
 
   // Se acumulan las sumas locales de cada procesador en sumaFinal sobre el proceso 0
   // ... (G)
-  double *vectorAux = NULL;
-  vectorAux = (double *) malloc (sizeof (double) * numProcs);
-  
-  MPI_Gather( &sumaLocal, 1, MPI_DOUBLE,
-        vectorAux, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Reduce( &sumaLocal, &sumaFinal, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
   if(miId == 0){
     for(i = 0; i < numProcs; i++){
-        sumaFinal += vectorAux[i];
+        sumaFinal += vectorLocal[i];
     }
   }
 
