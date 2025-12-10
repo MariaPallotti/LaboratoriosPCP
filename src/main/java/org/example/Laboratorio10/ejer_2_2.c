@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+
+// ============================================================================
+int main( int argc, char * argv[] ) {
+  int  numProcs, miId;
+
+  // Inicializa MPI.
+  MPI_Init( &argc, &argv );
+  MPI_Comm_size( MPI_COMM_WORLD, &numProcs );
+  MPI_Comm_rank( MPI_COMM_WORLD, &miId );
+  
+  // --------------------------------------------------------------------------
+  int prc, suma, aux, dato, i;
+  MPI_Status st ;
+  // Cada proceso dispone de un dato cualquiera.
+  dato = numProcs - miId + 1;
+  printf( "Proc %d Dato vale: %d \n", miId, dato );
+ 
+  // ... Incluir codigo asociado a los ejercicios 1 y 2
+
+  int ultimo = (numProcs % 2 == 0 ? numProcs - 2 : numProcs - 1);
+
+  if(miId % 2 == 0){
+    if(miId == 0){
+      if(numProcs > 2){
+        MPI_Recv( &aux, 1, MPI_INT, 2, 22, MPI_COMM_WORLD, &st);
+      }
+      dato += aux;
+      printf("La suma total = %d \n", dato);
+    }else if( miId == ultimo){
+      MPI_Send( &dato, 1, MPI_INT, ultimo-2, 22, MPI_COMM_WORLD);
+    }else {
+      MPI_Recv( &aux, 1, MPI_INT, miId+2, 22, MPI_COMM_WORLD, &st);
+      dato += aux;
+      MPI_Send( &dato, 1, MPI_INT, miId-2, 22, MPI_COMM_WORLD);
+    }
+  }
+
+  // --------------------------------------------------------------------------
+
+  // Finalizacion de MPI.
+  MPI_Finalize();
+
+  // Fin de programa.
+  printf( "Final de programa (%d) \n", miId );
+  return 0;
+}
+
